@@ -32,7 +32,7 @@ Satu peran: Pengguna (pemilik data). Bisa create/read/delete. Tidak ada approve.
 - US-005: ... simpan kredensial Turso di browser agar tidak hardcode. → FR-004
 
 ## 8. Functional Requirements
-- FR-001 [Core] Input transaksi. Traces to BO-001. Inputs: type{masuk,keluar}, amount>0 integer, trx_date YYYY-MM-DD, category, note. Validasi client+CHECK DB. AC-001.
+- FR-001 [Core] Input transaksi. Traces to BO-001. Inputs: type{masuk,keluar}, amount>0 integer, trx_date YYYY-MM-DD, category, note. Validasi client+CHECK DB. Edit via UPDATE by id (Turso) / replace by id (lokal); hapus butuh konfirmasi dan membatalkan mode edit bila baris yang diedit dihapus. AC-001.
 - FR-002 [Core] Laporan periode. Traces to BO-002. Harian=tanggal dipilih; mingguan=Senin–Minggu berisi tanggal; bulanan=1–akhir bulan. Output: net, total masuk/keluar, tabel. AC-002.
 - FR-003 [Core] Rincian tanggal. Traces to BO-002. Klik baris → set selectedDate, tampilkan daftar + subtotal. AC-003.
 - FR-004 [Supporting] Koneksi Turso. Traces to BO-003. Simpan URL+token di localStorage, test `SELECT 1`, init schema via `sql/schema.sql`. AC-004.

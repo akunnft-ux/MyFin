@@ -31,8 +31,8 @@
     </div>
   </section>
 
-  <section class="card">
-    <h2>Tambah Transaksi</h2>
+  <section class="card" id="form-card">
+    <h2 id="form-title">Tambah Transaksi</h2>
     <form id="tx-form" class="form">
       <div class="row">
         <label>Tipe
@@ -51,7 +51,10 @@
         </label>
       </div>
       <label>Catatan <input type="text" id="f-note" placeholder="keterangan (opsional)"></label>
-      <button class="btn" type="submit">Simpan</button>
+      <div class="row">
+        <button class="btn" type="submit" id="btn-submit">Simpan</button>
+        <button class="btn ghost" type="button" id="btn-cancel-edit" style="display:none">Batal Edit</button>
+      </div>
     </form>
   </section>
 

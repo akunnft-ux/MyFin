@@ -38,6 +38,7 @@ MyFin/
 
 ## 4. Fitur
 - Tambah pemasukan/pengeluaran (nominal, tanggal, kategori, catatan).
+- Edit (tombol Edit per baris → form terisi → Update / Batal Edit) & hapus (konfirmasi).
 - Ringkasan: net hari ini, net periode (harian/mingguan Senin–Minggu/bulanan), total saldo.
 - Tabel periode + filter tipe + search; klik baris → rincian tanggal.
 - Mode lokal otomatis bila Turso belum dikonfigurasi (data di localStorage).

@@ -3,7 +3,7 @@
  */
 const App = (() => {
   const LS_LOCAL = 'myfin_local_v1';
-  const state = { rows: [], view: 'harian', selectedDate: todayStr(), filterType: 'semua', search: '' };
+  const state = { rows: [], view: 'harian', selectedDate: todayStr(), filterType: 'semua', search: '', editingId: null };
 
   function todayStr(d = new Date()) {
     const p = n => String(n).padStart(2, '0');
@@ -67,6 +67,54 @@ const App = (() => {
     await loadAll();
   }
 
+  async function updateTx(id, tx) {
+    if (TursoDB.isConfigured()) {
+      await TursoDB.exec(
+        "UPDATE transactions SET type = ?, amount = ?, trx_date = ?, category = ?, note = ?, updated_at = datetime('now') WHERE id = ?",
+        [
+          { type: 'text', value: tx.type },
+          { type: 'integer', value: String(tx.amount) },
+          { type: 'text', value: tx.trx_date },
+          { type: 'text', value: tx.category },
+          { type: 'text', value: tx.note || '' },
+          { type: 'integer', value: String(id) }
+        ]
+      );
+    } else {
+      const rows = localLoad().map(r => String(r.id) === String(id)
+        ? { ...r, ...tx, id: r.id, created_at: r.created_at }
+        : r);
+      localSave(rows);
+    }
+    await loadAll();
+  }
+
+  function startEdit(id) {
+    const r = state.rows.find(x => String(x.id) === String(id));
+    if (!r) return alert('Data tidak ditemukan (mungkin terfilter).');
+    state.editingId = r.id;
+    document.getElementById('f-type').value = r.type;
+    document.getElementById('f-amount').value = r.amount;
+    document.getElementById('f-date').value = r.trx_date;
+    document.getElementById('f-cat').value = r.category || '';
+    document.getElementById('f-note').value = r.note || '';
+    document.getElementById('form-title').textContent = 'Edit Transaksi';
+    document.getElementById('btn-submit').textContent = 'Update';
+    document.getElementById('btn-cancel-edit').style.display = '';
+    document.getElementById('form-card').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function cancelEdit(resetForm = true) {
+    state.editingId = null;
+    if (resetForm) {
+      document.getElementById('tx-form').reset();
+      document.getElementById('f-date').value = todayStr();
+    }
+    document.getElementById('form-title').textContent = 'Tambah Transaksi';
+    document.getElementById('btn-submit').textContent = 'Simpan';
+    document.getElementById('btn-cancel-edit').style.display = 'none';
+  }
+
   async function deleteTx(id) {
     if (!confirm('Hapus transaksi ini?')) return;
     if (TursoDB.isConfigured()) {
@@ -74,6 +122,7 @@ const App = (() => {
     } else {
       localSave(localLoad().filter(r => String(r.id) !== String(id)));
     }
+    if (String(state.editingId) === String(id)) cancelEdit(true);
     await loadAll();
   }
 
@@ -134,9 +183,9 @@ const App = (() => {
         '<td><span class="badge ' + r.type + '">' + (r.type === 'masuk' ? 'Masuk' : 'Keluar') + '</span></td>' +
         '<td>' + escapeHtml(r.category) + (r.note ? '<br><span class="muted">' + escapeHtml(r.note) + '</span>' : '') + '</td>' +
         '<td style="text-align:right">' + fmtRp(r.amount) + '</td>' +
-        '<td><button class="btn small danger" data-del="' + r.id + '">Hapus</button></td>';
+        '<td><button class="btn small ghost" data-edit="' + r.id + '">Edit</button> <button class="btn small danger" data-del="' + r.id + '">Hapus</button></td>';
       tr.addEventListener('click', (e) => {
-        if (e.target.dataset.del) return; // tombol hapus
+        if (e.target.dataset.del || e.target.dataset.edit) return; // tombol aksi
         state.selectedDate = r.trx_date;
         document.getElementById('date-picker').value = r.trx_date;
         renderDetail(r.trx_date);
@@ -147,6 +196,9 @@ const App = (() => {
     }
     tb.querySelectorAll('[data-del]').forEach(btn => {
       btn.addEventListener('click', (e) => { e.stopPropagation(); deleteTx(btn.dataset.del); });
+    });
+    tb.querySelectorAll('[data-edit]').forEach(btn => {
+      btn.addEventListener('click', (e) => { e.stopPropagation(); startEdit(btn.dataset.edit); });
     });
   }
 
@@ -194,9 +246,19 @@ const App = (() => {
       };
       if (!tx.amount || tx.amount <= 0) return alert('Nominal harus > 0');
       if (!tx.trx_date) return alert('Tanggal wajib diisi');
-      try { await addTx(tx); e.target.reset(); document.getElementById('f-date').value = todayStr(); }
+      try {
+        if (state.editingId !== null) {
+          await updateTx(state.editingId, tx);
+          cancelEdit(true);
+        } else {
+          await addTx(tx);
+          e.target.reset();
+          document.getElementById('f-date').value = todayStr();
+        }
+      }
       catch (err) { alert('Gagal simpan: ' + err.message); }
     });
+    document.getElementById('btn-cancel-edit').addEventListener('click', () => cancelEdit(true));
 
     document.querySelectorAll('[data-view]').forEach(b =>
       b.addEventListener('click', () => { state.view = b.dataset.view; render(); }));
