@@ -2,28 +2,62 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1e1b4b">
 <title>MyFin — Catatan Keuangan</title>
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<header>
-  <h1>MyFin 💰</h1>
-  <p>Catatan pemasukan & pengeluaran · HTML+JS+CSS murni · Turso + GitHub Pages · <span id="storage-badge">…</span></p>
-</header>
-<main>
-  <section class="card">
-    <h2>Ringkasan</h2>
-    <div class="grid3">
-      <div class="stat"><span>Hari ini (net)</span><strong id="stat-hari">Rp 0</strong></div>
-      <div class="stat"><span id="stat-periode-label">Net periode</span><strong id="stat-periode">Rp 0</strong></div>
-      <div class="stat"><span>Total saldo</span><strong class="saldo" id="stat-saldo">Rp 0</strong></div>
+<header class="app-header">
+  <div class="app-header-inner">
+    <div class="brand-row">
+      <div class="brand">
+        <span class="brand-logo" aria-hidden="true">💰</span>
+        <div>
+          <strong>MyFin</strong>
+          <span class="brand-sub">Keuangan pribadiku</span>
+        </div>
+      </div>
+      <span id="storage-badge" class="pill">…</span>
     </div>
-    <p class="muted">Periode: <b id="range-label">-</b> · Masuk: <b class="in" id="sum-masuk">Rp 0</b> · Keluar: <b class="out" id="sum-keluar">Rp 0</b></p>
-    <div class="tabs">
-      <button data-view="harian" class="active">Harian</button>
-      <button data-view="mingguan">Mingguan</button>
-      <button data-view="bulanan">Bulanan</button>
+    <div class="hero">
+      <span class="hero-label">Total Saldo</span>
+      <strong class="hero-balance" id="stat-saldo">Rp 0</strong>
+      <div class="hero-flow">
+        <div class="flow in">
+          <span class="flow-ic" aria-hidden="true">↓</span>
+          <div><span>Masuk</span><strong id="sum-masuk">Rp 0</strong></div>
+        </div>
+        <div class="flow-divider" aria-hidden="true"></div>
+        <div class="flow out">
+          <span class="flow-ic" aria-hidden="true">↑</span>
+          <div><span>Keluar</span><strong id="sum-keluar">Rp 0</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="card period-card">
+    <div class="period-head">
+      <h2>Ringkasan</h2>
+      <span class="range" id="range-label">-</span>
+    </div>
+    <div class="period-stats">
+      <div class="pstat">
+        <span>Hari ini</span>
+        <strong id="stat-hari">Rp 0</strong>
+      </div>
+      <div class="pstat">
+        <span id="stat-periode-label">Net periode</span>
+        <strong id="stat-periode">Rp 0</strong>
+      </div>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Periode laporan">
+      <button data-view="harian" class="active" role="tab">Harian</button>
+      <button data-view="mingguan" role="tab">Mingguan</button>
+      <button data-view="bulanan" role="tab">Bulanan</button>
     </div>
     <div class="row">
       <label>Pilih tanggal <input type="date" id="date-picker"></label>
@@ -38,7 +72,7 @@
         <label>Tipe
           <select id="f-type"><option value="masuk">Pemasukan</option><option value="keluar">Pengeluaran</option></select>
         </label>
-        <label>Nominal (Rp) <input type="number" id="f-amount" min="1" step="1" required placeholder="50000"></label>
+        <label>Nominal (Rp) <input type="number" id="f-amount" min="1" step="1" required placeholder="50000" inputmode="numeric"></label>
       </div>
       <div class="row">
         <label>Tanggal <input type="date" id="f-date" required></label>
@@ -59,15 +93,15 @@
   </section>
 
   <section class="card">
-    <h2>Transaksi Periode Ini</h2>
-    <div class="row" style="margin-bottom:10px">
-      <label>Filter tipe
-        <select id="f-type-filter"><option value="semua">Semua</option><option value="masuk">Pemasukan</option><option value="keluar">Pengeluaran</option></select>
+    <div class="period-head">
+      <h2>Transaksi</h2>
+      <label class="inline-filter">Filter
+        <select id="f-type-filter"><option value="semua">Semua</option><option value="masuk">Masuk</option><option value="keluar">Keluar</option></select>
       </label>
-      <p class="muted">Klik baris untuk melihat rincian tanggal tersebut.</p>
     </div>
-    <table>
-      <thead><tr><th>Tanggal</th><th>Tipe</th><th>Kategori</th><th style="text-align:right">Jumlah</th><th></th></tr></thead>
+    <p class="muted hint">Ketuk kartu untuk rincian tanggal tersebut.</p>
+    <table class="tx-table">
+      <thead><tr><th>Tanggal</th><th>Tipe</th><th>Kategori</th><th style="text-align:right">Jumlah</th><th><span class="sr-only">Aksi</span></th></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
   </section>
@@ -79,19 +113,19 @@
 
   <section class="card">
     <h2>Pengaturan Turso</h2>
-    <p class="muted">Token disimpan di <b>localStorage browser kamu</b>, tidak di-commit ke repo. Kosongkan = mode lokal. Lihat <b>sql/schema.sql</b> & README untuk setup.</p>
+    <p class="muted">Token tersimpan di <b>localStorage browser kamu</b>, tidak ikut ke repo. Kosongkan = mode lokal. Panduan ada di README &amp; <b>sql/schema.sql</b>.</p>
     <div class="form">
-      <label>Database URL (https://xxx.turso.io) <input type="url" id="s-url" placeholder="https://…turso.io"></label>
-      <label>Auth Token <input type="password" id="s-token" placeholder="eyJhbGci…"></label>
-      <div class="row">
-        <button class="btn" id="btn-test" type="button">Simpan & Tes Koneksi</button>
+      <label>Database URL <input type="url" id="s-url" placeholder="https://…turso.io" inputmode="url"></label>
+      <label>Auth Token <input type="password" id="s-token" placeholder="••••••••" autocomplete="off"></label>
+      <div class="stack">
+        <button class="btn" id="btn-test" type="button">Simpan &amp; Tes Koneksi</button>
         <button class="btn ghost" id="btn-init" type="button">Init Schema ke Turso</button>
         <button class="btn danger" id="btn-clear" type="button">Hapus Konfigurasi</button>
       </div>
     </div>
   </section>
 </main>
-<footer>MyFin · static webapp · Turso libSQL · deploy via GitHub Pages</footer>
+<footer>MyFin · static webapp · Turso libSQL · GitHub Pages</footer>
 <script src="js/turso.js"></script>
 <script src="js/app.js"></script>
 </body>
