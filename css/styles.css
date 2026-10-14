@@ -148,7 +148,29 @@ button{font-family:inherit;cursor:pointer}
 .tx-table td:nth-child(5){margin-top:8px;display:flex;gap:8px}
 
 /* ---------- footer ---------- */
-footer{padding:18px;text-align:center;color:var(--muted);font-size:12px}
+footer{padding:18px 18px calc(96px + env(safe-area-inset-bottom));text-align:center;color:var(--muted);font-size:12px}
+
+/* ---------- bottom tab bar ---------- */
+.tab-hidden{display:none !important}
+.tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;
+  display:flex;gap:4px;
+  padding:8px 10px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(11,16,38,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-top:1px solid var(--border);
+}
+.tabbar button{
+  flex:1;border:0;background:transparent;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  min-height:56px;border-radius:14px;font-family:inherit;cursor:pointer;
+}
+.tabbar button span{font-size:21px;line-height:1}
+.tabbar button em{font-style:normal;font-size:11px;font-weight:700}
+.tabbar button.active{color:#fff;background:linear-gradient(135deg,rgba(99,102,241,.35),rgba(168,85,247,.35))}
+.tabbar button.active em{color:#fff}
+@media(min-width:640px){
+  .tabbar{left:50%;right:auto;transform:translateX(-50%);width:560px;border:1px solid var(--border);border-radius:20px 20px 0 0}
+}
 
 /* ---------- larger screens ---------- */
 @media(min-width:640px){

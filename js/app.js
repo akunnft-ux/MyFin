@@ -3,7 +3,21 @@
  */
 const App = (() => {
   const LS_LOCAL = 'myfin_local_v1';
-  const state = { rows: [], view: 'harian', selectedDate: todayStr(), filterType: 'semua', search: '', editingId: null };
+  const state = { rows: [], view: 'harian', selectedDate: todayStr(), filterType: 'semua', search: '', editingId: null, activeTab: 'beranda' };
+
+  // ---------- bottom tabs (visual navigation only) ----------
+  function switchTab(name) {
+    state.activeTab = name;
+    document.querySelectorAll('[data-tabpage]').forEach(el =>
+      el.classList.toggle('tab-hidden', el.dataset.tabpage !== name));
+    document.querySelectorAll('[data-tabbtn]').forEach(b => {
+      const on = b.dataset.tabbtn === name;
+      b.classList.toggle('active', on);
+      if (on) b.setAttribute('aria-current', 'page');
+      else b.removeAttribute('aria-current');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   function todayStr(d = new Date()) {
     const p = n => String(n).padStart(2, '0');
@@ -101,7 +115,7 @@ const App = (() => {
     document.getElementById('form-title').textContent = 'Edit Transaksi';
     document.getElementById('btn-submit').textContent = 'Update';
     document.getElementById('btn-cancel-edit').style.display = '';
-    document.getElementById('form-card').scrollIntoView({ behavior: 'smooth' });
+    switchTab('tambah');
   }
 
   function cancelEdit(resetForm = true) {
@@ -255,10 +269,13 @@ const App = (() => {
           e.target.reset();
           document.getElementById('f-date').value = todayStr();
         }
+        switchTab('riwayat');
       }
       catch (err) { alert('Gagal simpan: ' + err.message); }
     });
     document.getElementById('btn-cancel-edit').addEventListener('click', () => cancelEdit(true));
+    document.querySelectorAll('[data-tabbtn]').forEach(b =>
+      b.addEventListener('click', () => switchTab(b.dataset.tabbtn)));
 
     document.querySelectorAll('[data-view]').forEach(b =>
       b.addEventListener('click', () => { state.view = b.dataset.view; render(); }));
@@ -298,7 +315,7 @@ const App = (() => {
     document.getElementById('s-token').value = cfg.token || '';
   }
 
-  return { boot: async () => { bind(); await loadAll().catch(err => { render(); console.error(err); }); } };
+  return { boot: async () => { bind(); switchTab('beranda'); await loadAll().catch(err => { render(); console.error(err); }); } };
 })();
 
 document.addEventListener('DOMContentLoaded', App.boot);

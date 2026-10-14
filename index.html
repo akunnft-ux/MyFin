@@ -39,7 +39,7 @@
 </header>
 
 <main>
-  <section class="card period-card">
+  <section class="card period-card" data-tabpage="beranda">
     <div class="period-head">
       <h2>Ringkasan</h2>
       <span class="range" id="range-label">-</span>
@@ -65,7 +65,7 @@
     </div>
   </section>
 
-  <section class="card" id="form-card">
+  <section class="card" id="form-card" data-tabpage="tambah">
     <h2 id="form-title">Tambah Transaksi</h2>
     <form id="tx-form" class="form">
       <div class="row">
@@ -92,7 +92,7 @@
     </form>
   </section>
 
-  <section class="card">
+  <section class="card" data-tabpage="riwayat">
     <div class="period-head">
       <h2>Transaksi</h2>
       <label class="inline-filter">Filter
@@ -106,12 +106,12 @@
     </table>
   </section>
 
-  <section class="card" id="detail">
+  <section class="card" id="detail" data-tabpage="riwayat">
     <h2>Rincian Tanggal</h2>
     <div id="detail-body" class="detail"><p class="muted">Pilih tanggal…</p></div>
   </section>
 
-  <section class="card">
+  <section class="card" data-tabpage="pengaturan">
     <h2>Pengaturan Turso</h2>
     <p class="muted">Token tersimpan di <b>localStorage browser kamu</b>, tidak ikut ke repo. Kosongkan = mode lokal. Panduan ada di README &amp; <b>sql/schema.sql</b>.</p>
     <div class="form">
@@ -125,6 +125,12 @@
     </div>
   </section>
 </main>
+<nav class="tabbar" aria-label="Navigasi utama">
+  <button type="button" data-tabbtn="beranda" class="active" aria-current="page"><span aria-hidden="true">🏠</span><em>Beranda</em></button>
+  <button type="button" data-tabbtn="tambah"><span aria-hidden="true">➕</span><em>Tambah</em></button>
+  <button type="button" data-tabbtn="riwayat"><span aria-hidden="true">🧾</span><em>Riwayat</em></button>
+  <button type="button" data-tabbtn="pengaturan"><span aria-hidden="true">⚙️</span><em>Atur</em></button>
+</nav>
 <footer>MyFin · static webapp · Turso libSQL · GitHub Pages</footer>
 <script src="js/turso.js"></script>
 <script src="js/app.js"></script>
