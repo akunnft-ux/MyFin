@@ -1,0 +1,9 @@
+# MyFin — jangan commit kredensial
+.env
+.env.*
+*.token
+*credentials*.json
+credentials.json
+.turso/
+.DS_Store
+Thumbs.db
